@@ -13,12 +13,21 @@ public class SecureContainer {
     private static final Logger LOGGER = LoggerFactory.getLogger(SecureContainer.class);
 
     private static final String INPUT_CHALLENGE = "171309-643603";
+//    private static final String INPUT_CHALLENGE = "134564-585159";
+//    private static final String INPUT_CHALLENGE = "111110-111122";
 
     private static HashMap<Integer,Integer> sameDigitMapper = new HashMap<>();
 
     private static List<Integer> validPasswords = new ArrayList<>();
 
     public static void main(String[] args) {
+
+        /*
+         * Maximum 6 digits
+         * Value within the input range
+         * Two adjacent digits are the same
+         * Digits never decrease from left to right
+         */
 
         String[] inputRange = INPUT_CHALLENGE.split("-");
 
@@ -27,8 +36,13 @@ public class SecureContainer {
 
         for (; startRange <= endRange; startRange++) {
 
-            if (isValidPassword(startRange)) {
-                LOGGER.info("Valid password: {}", startRange);
+            /*
+             * Set a boolean to determine which part needs to be run
+             * true = run Part 1
+             * false = run Part 2
+             */
+            if (isValidPassword(startRange, false)) {
+                LOGGER.debug("Valid password: {}", startRange);
                 validPasswords.add(startRange);
             }
         }
@@ -37,7 +51,7 @@ public class SecureContainer {
 
     }
 
-    private static boolean isValidPassword(int password) {
+    private static boolean isValidPassword(int password, boolean isPart1) {
 
         // initialise same digit mapper
         for (int i = 0; i <= 9; i++) {
@@ -55,7 +69,6 @@ public class SecureContainer {
 
             if (firstDigit == secondDigit) {
                 sameDigitMapper.put(firstDigit, sameDigitMapper.get(firstDigit)+1);
-//                sameDigits = true;
             } else {
                 if (firstDigit > secondDigit) {
                     return false;
@@ -63,9 +76,15 @@ public class SecureContainer {
             }
         }
 
-        for (Map.Entry digit : sameDigitMapper.entrySet()) {
-            if ((int) digit.getValue() == 1) {
-                return true;
+        for (Map.Entry<Integer,Integer> sameDigit : sameDigitMapper.entrySet()) {
+            if (isPart1) {
+                if (sameDigit.getValue() >= 1) {
+                    return true;
+                }
+            } else {
+                if (sameDigit.getValue() == 1) {
+                    return true;
+                }
             }
         }
 
@@ -77,12 +96,9 @@ public class SecureContainer {
         List<Integer> digits = new ArrayList<>();
 
         while (password > 0) {
-            int digit = password % 10;
+            digits.add(password % 10);
             password /= 10;
-
-            digits.add(digit);
         }
-
         return digits;
     }
 }
